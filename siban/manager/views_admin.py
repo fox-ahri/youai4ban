@@ -10,7 +10,7 @@ class AdminView(APIView):
     authentication_classes = [JwtAuthentication, ]
 
     def get(self, request):
-        u = User.objects.filter(pk=request.query_params.get('id')).first()
+        u = User.objects.filter(pk=request.user['id']).first()
         if u:
             ui = UserInfo.objects.filter(user=u).first()
             if ui:

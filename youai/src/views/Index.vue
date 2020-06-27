@@ -1,7 +1,24 @@
 <template>
-  <div class="container">
-    <div class="box" v-for="i in family" :key="i.id">
-      <img :src="i.img" :alt="i.name" />
+  <div
+    class="container"
+    v-loading="loading"
+    element-loading-text="拼命加载中"
+    element-loading-spinner="el-icon-loading"
+    element-loading-background="rgba(0, 0, 0, 0.8)"
+  >
+    <div
+      v-show="!loading"
+      class="box"
+      v-for="i in family"
+      :key="i.id"
+      @click="$router.push({name:'I', query:{id:i.id}})"
+    >
+      <el-image :src="i.image" lazy>
+        <div slot="placeholder" class="image-slot">
+          加载中
+          <span class="dot">...</span>
+        </div>
+      </el-image>
       <h2>{{i.name}}</h2>
       <p>{{i.introduce}}</p>
     </div>
@@ -12,83 +29,53 @@
 </template>
 
 <script>
-
 export default {
-  name: 'Home',
+  name: "Home",
   data () {
     return {
-      family: []
-    }
+      family: [],
+      loading: false
+    };
   },
   methods: {
     disruption (data) {
-      data.sort(() => 0.5 - Math.random())
-      return data
-    },
-    request () {
-      let data = [{
-        id: 1,
-        img: "https://api.ahriknow.com/image?album=girl,1",
-        name: "Lorem ipsum dolor",
-        introduce: `Lorem ipsum dolor sit amet, consectetur adipisicing elit. Suscipit est
-        veniam molestiae et aspernatur.`
-      }, {
-        id: 2,
-        img: "https://api.ahriknow.com/image?album=girl,10",
-        name: "Lorem ipsum dolor",
-        introduce: `Lorem ipsum dolor sit amet, consectetur adipisicing elit. Suscipit est
-        veniam molestiae et aspernatur, optio, vitae esse sequi eius
-        temporibus deserunt possimus in totam distinctio! Iusto, iste? Magnam,
-        illum esse, iste? Magnam, illum esse. iste? Magnam,
-        illum esse, iste? Magnam, illum esse.`
-      }, {
-        id: 3,
-        img: "https://api.ahriknow.com/image?album=girl,100",
-        name: "Lorem ipsum dolor",
-        introduce: `Lorem ipsum dolor sit amet, consectetur adipisicing elit. Suscipit est
-        veniam molestiae et aspernatur, optio, vitae esse sequi eius
-        temporibus deserunt possimus in totam distinctio! Iusto, iste? Magnam,
-        illum esse, iste? Magnam, illum esse.`
-      }, {
-        id: 4,
-        img: "https://api.ahriknow.com/image?album=girl,1000",
-        name: "Lorem ipsum dolor",
-        introduce: `Lorem ipsum dolor sit amet, consectetur adipisicing elit. Suscipit est
-        veniam molestiae et aspernatur, optio, vitae esse sequi eius
-        temporibus deserunt possimus in totam distinctio! Iusto, iste? Magnam,
-        illum esse, iste? Magnam, illum esse. optio, vitae esse sequi eius
-        temporibus deserunt possimus in totam distinctio! Iusto, iste? Magnam,
-        illum esse, iste? Magnam, illum esse.`
-      }, {
-        id: 5,
-        img: "https://api.ahriknow.com/image?album=girl,166",
-        name: "Lorem ipsum dolor",
-        introduce: `Lorem ipsum dolor sit amet, consectetur adipisicing elit. Suscipit est
-        veniam molestiae et aspernatur, optio, vitae esse sequi eius
-        temporibus deserunt possimus in totam distinctio! Iusto, iste? Magnam,
-        illum esse, iste? Magnam, illum esse.Lorem ipsum dolor sit amet, consectetur adipisicing elit. Suscipit est
-        veniam molestiae et aspernatur, optio, vitae esse sequi eius
-        temporibus deserunt possimus in totam distinctio! Iusto, iste? Magnam,
-        illum esse, iste? Magnam, illum esse.`
-      }]
-      this.family = this.disruption(data)
+      data.sort(() => 0.5 - Math.random());
+      return data;
     }
   },
   mounted () {
-    this.request()
-    let token = localStorage.getItem('token')
+    let token = localStorage.getItem("token");
     if (token) {
-      let user = token.split('.')[1]
-      let userObj = JSON.parse(decodeURIComponent(escape(window.atob(user))))
+      let user = token.split(".")[1];
+      let userObj = JSON.parse(decodeURIComponent(escape(window.atob(user))));
       if (userObj.exp < new Date().getTime() / 1000) {
-        localStorage.clear()
+        localStorage.clear();
       }
     }
+    this.loading = true;
+    this.axios
+      .get(this.url + "/index/")
+      .then(res => {
+        if (res.data.code === 200) {
+          this.family = this.disruption(res.data.data);
+        } else {
+          this.$message.error(res.data.msg);
+        }
+        this.loading = false;
+      })
+      .catch(err => {
+        this.$message.error(err.message);
+        this.loading = false;
+      });
   }
-}
+};
 </script>
 
 <style scoped>
+.el-image {
+  width: 100%;
+  height: 100%;
+}
 .container {
   width: 1200px;
   margin: 10px auto;
@@ -103,19 +90,32 @@ export default {
   background: #fff;
   overflow: hidden;
   break-inside: avoid;
+  cursor: pointer;
 }
-.container .box img {
+.container .box:hover .el-image {
+  transform: scale(0.98);
+}
+.container .box:hover h2 {
+  transform: scale(0.98);
+}
+.container .box:hover p {
+  transform: scale(0.98);
+}
+.container .box .el-image  {
   max-width: 100%;
+  transition: 0.2s;
 }
 .container .box h2 {
   margin: 10px 0 0;
   padding: 0;
   font-size: 20px;
+  transition: 0.2s;
 }
 .container .box p {
   margin: 0;
   padding: 0 0 10px;
   font-size: 16px;
+  transition: 0.2s;
 }
 .container .box h1 {
   cursor: pointer;

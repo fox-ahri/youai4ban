@@ -1,19 +1,27 @@
 # youaisiban
 
-## Project setup
-```
-npm install
-```
-
-### Compiles and hot-reloads for development
-```
-npm run serve
+## siban/manager/views_upload.py
+```python
+auth = oss2.Auth('<AK>', '<SK>')
+bucket = oss2.Bucket(auth, '<地域名>', '<Bucket Name>')
+s = '<域名>' + file_name
 ```
 
-### Compiles and minifies for production
-```
-npm run build
+## siban/siban/settings.py
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': '<数据库主机名/IP>',
+        'PORT': '3306',
+        'NAME': '<数据库名>',
+        'USER': '<数据库用户名>',
+        'PASSWORD': '<数据库密码>',
+    },
+}
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## youai/sec/main.js
+```js
+Vue.prototype.url = "后端地址(末尾不能有 '/')"
+```

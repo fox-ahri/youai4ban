@@ -10,13 +10,13 @@
           text-color="#fff"
           active-text-color="#ffd04b"
         >
-          <el-menu-item index="1">有爱四班</el-menu-item>
+          <el-menu-item index="1" @click="$router.push({name: 'Index'})">有爱四班</el-menu-item>
         </el-menu>
       </el-header>
       <el-container>
         <el-aside width="260px">
           <el-menu
-            default-active="/admin/user"
+            :default-active="tab"
             class="el-menu-vertical-demo"
             background-color="#545c64"
             text-color="#fff"
@@ -35,7 +35,10 @@
         </el-aside>
         <el-container>
           <el-main>
-            <router-view />
+            <keep-alive>
+              <router-view v-if="$route.meta.keepAlive"></router-view>
+            </keep-alive>
+            <router-view v-if="!$route.meta.keepAlive"></router-view>
           </el-main>
         </el-container>
       </el-container>
@@ -45,14 +48,20 @@
 
 <script>
 export default {
-  name: 'admin',
+  name: "admin",
+  data () {
+    return {
+      tab: "/admin/user"
+    };
+  },
   mounted () {
-    let token = localStorage.getItem('token')
+    let token = localStorage.getItem("token");
     if (!token) {
-      this.$router.push({ name: 'Auth' })
+      this.$router.push({ name: "Auth" });
     }
+    this.tab = this.$route.path;
   }
-}
+};
 </script>
 
 <style>
@@ -62,6 +71,7 @@ export default {
 }
 .el-container {
   height: 100%;
+  position: relative;
 }
 .el-header {
   background-color: #545c64;
@@ -74,7 +84,13 @@ export default {
   width: 200px;
 }
 .el-main {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-color: #fff;
+  padding: 0 !important;
 }
 .el-menu {
   height: 100%;

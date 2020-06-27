@@ -2,9 +2,16 @@ import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
 
+import 'mavon-editor/dist/css/index.css'
+
+import VueLazyLoad from 'vue-lazyload'
+Vue.use(VueLazyLoad, {})
+
 import axios from "axios";
 import VueAxios from "vue-axios";
 Vue.use(VueAxios, axios);
+
+Vue.prototype.url = "http://127.0.0.1:9000"
 
 axios.interceptors.request.use(
   (request) => {
